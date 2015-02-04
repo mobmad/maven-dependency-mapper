@@ -12,6 +12,7 @@ Local environment:
 * Do a "mvn no.finntech:dependency-mapper-maven-plugin:1.0-SNAPSHOT:read"
 
 Override neo4j server setting with -Dneo4jServer=http://yourserver:yourport, defaults to http://localhost:7474
+Add branch information to artifacts with -Dbranch=feature/add-awesomeness. This is useful for builds on feature branches.
 
 
 Example output:

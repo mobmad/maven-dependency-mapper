@@ -19,6 +19,7 @@ package no.finntech;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
@@ -65,6 +66,14 @@ public class StoreGraphDependencyMojo
      */
     private String neo4jServer;
 
+    /**
+     * Neo4J Server.
+     * @parameter
+     *   expression="${branch}"
+     *   default-value=""
+     */
+    private String branch;
+
     RestAPI restAPI;
 
 
@@ -106,7 +115,12 @@ public class StoreGraphDependencyMojo
 
     private Node makeNode(Artifact artifact) {
         String completeId = ArtifactHelper.splice(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion());
-        Node projectNode = restAPI.getOrCreateNode(index, COMPLETE_ID, completeId, ArtifactHelper.getProperties(artifact));
+        Map<String, Object> properties = ArtifactHelper.getProperties(artifact);
+        if(branch != null) {
+            completeId = branch + completeId;
+            properties.put("branch", branch);
+        }
+        Node projectNode = restAPI.getOrCreateNode(index, COMPLETE_ID, completeId, properties);
         restAPI.getIndex(ARTIFACT).add(projectNode, GROUP_ID_AND_ARTIFACT_ID, ArtifactHelper.splice(artifact.getGroupId(), artifact.getArtifactId()));
         restAPI.getIndex(ARTIFACT).add(projectNode, COMPLETE_ID, completeId);
         return projectNode;
@@ -114,6 +128,11 @@ public class StoreGraphDependencyMojo
 
     private Node makeNode(Dependency dependency) {
         String completeId = ArtifactHelper.splice(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion());
+        Map<String, Object> properties = ArtifactHelper.getProperties(dependency);
+        if(branch != null) {
+            completeId = branch + completeId;
+            properties.put("branch", branch);
+        }
         Node projectNode = restAPI.getOrCreateNode(index, COMPLETE_ID, completeId, ArtifactHelper.getProperties(dependency));
         restAPI.getIndex(ARTIFACT).add(projectNode, GROUP_ID_AND_ARTIFACT_ID, ArtifactHelper.splice(dependency.getGroupId(), dependency.getArtifactId()));
         return projectNode;
